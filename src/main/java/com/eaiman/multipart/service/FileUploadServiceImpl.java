@@ -6,6 +6,7 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.stream.Stream;
 @Service
 public class FileUploadServiceImpl implements FileUploadService {
 
+    // this is for multiple file upload
     @Override
     public Flux<String> getLines(Flux<FilePart> filePartFlux) {
 
@@ -30,6 +32,34 @@ public class FileUploadServiceImpl implements FileUploadService {
 
                     return new String(bytes, StandardCharsets.UTF_8);
                 }))
+                .flatMapIterable(this::processAndGetLinesAsList);
+    }
+
+    // this is for single file upload
+    @Override
+    public Flux<String> getLines(Mono<FilePart> filePartMono) {
+
+        return filePartMono.flatMapMany(filePart ->
+                filePart.content().map(dataBuffer -> {
+                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                    dataBuffer.read(bytes);
+                    DataBufferUtils.release(dataBuffer);
+
+                    return new String(bytes, StandardCharsets.UTF_8);
+                }))
+                .flatMapIterable(this::processAndGetLinesAsList);
+    }
+
+    // this is for single file upload
+    @Override
+    public Flux<String> getLines(FilePart filePart) {
+        return filePart.content().map(dataBuffer -> {
+            byte[] bytes = new byte[dataBuffer.readableByteCount()];
+            dataBuffer.read(bytes);
+            DataBufferUtils.release(dataBuffer);
+
+            return new String(bytes, StandardCharsets.UTF_8);
+        })
                 .flatMapIterable(this::processAndGetLinesAsList);
     }
 

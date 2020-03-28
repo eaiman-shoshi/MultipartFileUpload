@@ -20,13 +20,10 @@ public class FileUploadController {
 
     private final FileUploadService fileUploadService;
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    // use Flux<FilePart> for multiple file upload
+    @PostMapping(value = "/upload-flux", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
-
-//    public Mono<List<String>> upload(@RequestPart("file") FilePart filePartFlux) {
-//    public Mono<List<String>> upload(@RequestPart("file") Mono<FilePart> filePartFlux) {
-//    public Mono<List<String>> upload(@RequestPart("file") Mono<MultiValueMap<String, Part> filePartFlux) {
-    public Mono<List<String>> upload(@RequestPart("file") Flux<FilePart> filePartFlux) {
+    public Mono<List<String>> upload(@RequestPart("files") Flux<FilePart> filePartFlux) {
 
         /*
           To see the response beautifully we are returning strings as Mono List
@@ -36,4 +33,34 @@ public class FileUploadController {
          */
         return fileUploadService.getLines(filePartFlux).collectList();
     }
+
+    // use single FilePart for single file upload
+    @PostMapping(value = "/upload-mono", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    @ResponseStatus(value = HttpStatus.OK)
+    public Mono<List<String>> upload(@RequestPart("file") Mono<FilePart> filePartMono) {
+
+        /*
+          To see the response beautifully we are returning strings as Mono List
+          of String. We could have returned Flux<String> from here.
+          If you are curious enough then just return Flux<String> from here and
+          see the response on Postman
+         */
+        return fileUploadService.getLines(filePartMono).collectList();
+    }
+
+    // use single FilePart for single file upload
+    @PostMapping(value = "/upload-filePart", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    @ResponseStatus(value = HttpStatus.OK)
+    public Mono<List<String>> upload(@RequestPart("file") FilePart filePart) {
+
+        /*
+          To see the response beautifully we are returning strings as Mono List
+          of String. We could have returned Flux<String> from here.
+          If you are curious enough then just return Flux<String> from here and
+          see the response on Postman
+         */
+        return fileUploadService.getLines(filePart).collectList();
+    }
+
+//    public Mono<List<String>> upload(@RequestPart("file") Mono<MultiValueMap<String, Part> filePartMap) {
 }
