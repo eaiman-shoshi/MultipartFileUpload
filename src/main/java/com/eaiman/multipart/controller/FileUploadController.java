@@ -65,7 +65,7 @@ public class FileUploadController {
     }
 
     // use Mono<MultiValueMap<String, Part>> for both single and multiple file upload under `files` param key
-    @PostMapping(value = "/upload-map", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    @PostMapping(value = "/upload-multiValueMap", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
     public Mono<List<String>> uploadFileMap(@RequestBody Mono<MultiValueMap<String, Part>> filePartMap) {
         /*
