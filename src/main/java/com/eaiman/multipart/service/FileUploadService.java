@@ -6,6 +6,8 @@ import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
+
 public interface FileUploadService {
     // this is for multiple file upload
     Flux<String> getLines(Flux<FilePart> filePartFlux);
